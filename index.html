@@ -291,6 +291,7 @@
     color: var(--navy);
     letter-spacing: 0.04em;
     flex: 1;
+    white-space: nowrap;
   }
   .nav-btn {
     width: 36px; height: 36px;
@@ -824,19 +825,17 @@
     /* カレンダーグリッド：横スクロール対応 */
     .calendar-wrap, #all-months-wrap { padding: 0 8px 20px; }
 
-    /* スマホ：カレンダー固定幅（1列100px×7列=700px）*/
-    #single-month-wrap .calendar,
-    .month-block .calendar {
+    /* スマホ：カレンダー固定幅 */
+    .cal-header-row {
+      grid-template-columns: repeat(7, 100px) !important;
       width: 700px;
     }
-    #single-month-wrap .cal-header-row,
-    #single-month-wrap .cal-body,
-    .month-block .cal-header-row,
-    .month-block .cal-body {
-      grid-template-columns: repeat(7, 100px);
+    .cal-body {
+      grid-template-columns: repeat(7, 100px) !important;
+      width: 700px;
     }
-    .cal-cell { min-width: 100px; }
-    .cal-dow { min-width: 100px; }
+    .cal-cell { width: 100px !important; min-height: 100px !important; }
+    .cal-dow { width: 100px !important; }
     .cal-header-row .cal-dow { font-size: 11px; padding: 8px 4px; }
     .cal-cell { min-height: 90px; padding: 4px; min-width: 80px; }
     .day-num { font-size: 12px; width: 22px; height: 22px; }
@@ -866,15 +865,13 @@
 
     /* 年間一覧 */
     .month-block-title { font-size: 15px; }
-    /* calendar の overflow を強制解除 */
-    #single-month-wrap,
-    #single-month-wrap .calendar,
-    #single-month-wrap .cal-body {
-      overflow-x: visible !important;
-    }
-    #single-month-wrap {
+    /* スクロールコンテナ強制設定 */
+    .cal-scroll-box {
       overflow-x: auto !important;
+      overflow-y: visible !important;
       -webkit-overflow-scrolling: touch !important;
+      width: 100% !important;
+      display: block !important;
     }
   }
 </style>
@@ -958,17 +955,19 @@
 </div>
 
 <div class="calendar-wrap" id="single-month-wrap">
-  <div class="calendar">
-    <div class="cal-header-row">
-      <div class="cal-dow">月</div>
-      <div class="cal-dow">火</div>
-      <div class="cal-dow">水</div>
-      <div class="cal-dow">木</div>
-      <div class="cal-dow">金</div>
-      <div class="cal-dow sat">土</div>
-      <div class="cal-dow sun">日</div>
+  <div class="cal-scroll-box" id="cal-scroll-box">
+    <div class="calendar" id="cal-inner">
+      <div class="cal-header-row">
+        <div class="cal-dow">月</div>
+        <div class="cal-dow">火</div>
+        <div class="cal-dow">水</div>
+        <div class="cal-dow">木</div>
+        <div class="cal-dow">金</div>
+        <div class="cal-dow sat">土</div>
+        <div class="cal-dow sun">日</div>
+      </div>
+      <div class="cal-body" id="cal-body"></div>
     </div>
-    <div class="cal-body" id="cal-body"></div>
   </div>
 </div>
 
@@ -1235,7 +1234,7 @@ function renderAllMonths() {
 
     const calDiv = document.createElement('div');
     calDiv.className = 'calendar';
-    calDiv.innerHTML = `<div class="cal-header-row"><div class="cal-dow">月</div><div class="cal-dow">火</div><div class="cal-dow">水</div><div class="cal-dow">木</div><div class="cal-dow">金</div><div class="cal-dow sat">土</div><div class="cal-dow sun">日</div></div><div class="cal-body" id="cal-body-${year}-${month}"></div>`;
+    calDiv.innerHTML = `<div class="cal-scroll-box"><div class="cal-header-row"><div class="cal-dow">月</div><div class="cal-dow">火</div><div class="cal-dow">水</div><div class="cal-dow">木</div><div class="cal-dow">金</div><div class="cal-dow sat">土</div><div class="cal-dow sun">日</div></div><div class="cal-body" id="cal-body-${year}-${month}"></div></div>`;
     block.appendChild(calDiv);
     allWrap.appendChild(block);
     buildMonthGrid(`cal-body-${year}-${month}`, year, month, byDate);
@@ -1245,6 +1244,7 @@ function renderAllMonths() {
   document.getElementById('stat-pills').innerHTML =
     `<span class="stat-pill" style="background:#e8f0fe;color:#2e4a8a">${totalDays}授業日</span>` +
     `<span class="stat-pill" style="background:#e8f0fe;color:#2e4a8a">${totalEvents}コマ</span>`;
+  setTimeout(setupScrollWrap, 0);
 }
 
 function renderSingleMonth() {
@@ -1573,13 +1573,23 @@ function initTouchScroll(el) {
 }
 
 function setupScrollWrap() {
-  // single-month-wrap を scroll コンテナに
-  const wrap = document.getElementById('single-month-wrap');
-  if (!wrap) return;
-  wrap.style.overflowX = 'auto';
-  wrap.style.overflowY = 'hidden';
-  wrap.style.webkitOverflowScrolling = 'touch';
-  initTouchScroll(wrap);
+  const box = document.getElementById('cal-scroll-box');
+  if (!box) return;
+  box.style.overflowX = 'auto';
+  box.style.overflowY = 'visible';
+  box.style.webkitOverflowScrolling = 'touch';
+  box.style.width = '100%';
+  box.style.display = 'block';
+  initTouchScroll(box);
+  // 年間一覧の全scroll-boxにも適用
+  document.querySelectorAll('.cal-scroll-box').forEach(el => {
+    el.style.overflowX = 'auto';
+    el.style.overflowY = 'visible';
+    el.style.webkitOverflowScrolling = 'touch';
+    el.style.width = '100%';
+    el.style.display = 'block';
+    initTouchScroll(el);
+  });
 }
 
 // Init
