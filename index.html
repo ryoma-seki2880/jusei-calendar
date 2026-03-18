@@ -824,16 +824,24 @@
 
     /* カレンダーグリッド：横スクロール対応 */
     .calendar-wrap, #all-months-wrap { padding: 0 8px 20px; }
-    .calendar-wrap {
+
+    /* Android Chrome横スクロール対応 */
+    #single-month-wrap {
       overflow-x: auto;
-      overflow-y: visible;
+      overflow-y: hidden;
       -webkit-overflow-scrolling: touch;
+      touch-action: pan-x;
+      padding-bottom: 8px;
     }
-    #single-month-wrap .calendar,
-    .month-block .calendar {
+    #single-month-wrap .calendar {
       min-width: 600px;
       overflow: visible;
       border-radius: 12px;
+      touch-action: pan-x;
+    }
+    #single-month-wrap .cal-body,
+    #single-month-wrap .cal-header-row {
+      touch-action: pan-x;
     }
     .cal-header-row .cal-dow { font-size: 11px; padding: 8px 4px; }
     .cal-cell { min-height: 90px; padding: 4px; min-width: 80px; }
