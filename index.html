@@ -359,13 +359,13 @@
     border-radius: 16px;
     box-shadow: 0 4px 24px rgba(26,39,68,0.08);
     border: 1px solid var(--border);
-    min-width: 980px;
+    min-width: 1050px;
   }
 
 
   .cal-header-row {
     display: grid;
-    grid-template-columns: repeat(7, minmax(140px, 1fr));
+    grid-template-columns: repeat(7, 150px);
     background: var(--navy);
   }
   .cal-dow {
@@ -381,7 +381,7 @@
 
   .cal-body {
     display: grid;
-    grid-template-columns: repeat(7, minmax(140px, 1fr));
+    grid-template-columns: repeat(7, 150px);
   }
   .cal-cell {
     border-right: 1px solid var(--border);
@@ -391,6 +391,7 @@
     position: relative;
     background: var(--bg-card);
     transition: background 0.15s;
+    box-sizing: border-box;
   }
   .cal-cell:nth-child(7n) { border-right: none; }
   .cal-cell.other-month {
@@ -786,10 +787,7 @@
     .legend { padding: 0 12px 10px; }
     .calendar-wrap, #all-months-wrap { padding-left: 12px; padding-right: 12px; }
     .vtog-btn { padding: 5px 9px; font-size: 11px; }
-    .event-chip .ev-koshi { display: none; }
-    .cal-cell { min-height: 90px; padding: 3px; }
-    .event-chip { font-size: 9px; }
-    .event-chip .ev-jigen-block { min-width: 22px; }
+
     .event-chip .ev-jigen-num { font-size: 10px; }
     .event-chip .ev-jigen-time { display: none; }
   }
@@ -832,17 +830,7 @@
     /* カレンダーグリッド */
     .calendar-wrap, #all-months-wrap { padding: 0 8px 20px; }
 
-    .day-num { font-size: 12px; width: 22px; height: 22px; }
-
-    /* イベントチップ */
-    .event-chip { min-height: 28px; margin-bottom: 3px; border-radius: 5px; }
-    .event-chip .ev-jigen-block { min-width: 20px; padding: 2px 4px; }
-    .event-chip .ev-jigen-num { font-size: 11px; }
-    .event-chip .ev-jigen-time { display: none; }
-    .event-chip .ev-body { padding: 2px 5px; }
-    .event-chip .ev-name { font-size: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 110px; }
-    .event-chip .ev-koshi { display: none; }
-    .more-badge { font-size: 10px; }
+    /* チップはPCと同じ表示 */
 
     /* モーダル */
     .modal { padding: 16px; border-radius: 12px; }
