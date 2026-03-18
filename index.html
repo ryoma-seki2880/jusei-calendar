@@ -348,17 +348,24 @@
   .calendar-wrap {
     padding: 0 32px 32px;
   }
+  /* スクロールコンテナ */
+  .cal-scroll-box {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
   .calendar {
     background: var(--bg-card);
     border-radius: 16px;
     box-shadow: 0 4px 24px rgba(26,39,68,0.08);
     border: 1px solid var(--border);
+    min-width: 700px;
   }
 
 
   .cal-header-row {
     display: grid;
-    grid-template-columns: repeat(7, 1fr);
+    grid-template-columns: repeat(7, minmax(100px, 1fr));
     background: var(--navy);
   }
   .cal-dow {
@@ -374,7 +381,7 @@
 
   .cal-body {
     display: grid;
-    grid-template-columns: repeat(7, 1fr);
+    grid-template-columns: repeat(7, minmax(100px, 1fr));
   }
   .cal-cell {
     border-right: 1px solid var(--border);
@@ -825,31 +832,6 @@
     /* カレンダーグリッド */
     .calendar-wrap, #all-months-wrap { padding: 0 8px 20px; }
 
-    /* ===== カレンダー横スクロール ===== */
-    .cal-scroll-box {
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
-    }
-    .cal-scroll-box .calendar,
-    .cal-scroll-box .cal-header-row,
-    .cal-scroll-box .cal-body {
-      width: 700px;
-      min-width: 700px;
-    }
-    .cal-scroll-box .cal-header-row,
-    .cal-scroll-box .cal-body {
-      grid-template-columns: 100px 100px 100px 100px 100px 100px 100px;
-    }
-    .cal-scroll-box .cal-dow,
-    .cal-scroll-box .cal-cell {
-      width: 100px;
-      min-width: 100px;
-      max-width: 100px;
-      box-sizing: border-box;
-    }
-    .cal-scroll-box .cal-cell {
-      min-height: 100px;
-    }
     .day-num { font-size: 12px; width: 22px; height: 22px; }
 
     /* イベントチップ */
@@ -1111,6 +1093,7 @@ function renderCalendar() {
   if (viewMode === 'all') renderAllMonths();
   else if (viewMode === 'agenda') renderAgenda();
   else renderSingleMonth();
+  setTimeout(setupScrollWrap, 50);
 }
 
 function setViewMode(mode) {
@@ -1578,9 +1561,9 @@ function initTouchScroll(el) {
 }
 
 function setupScrollWrap() {
-  // タッチスクロールをcal-scroll-boxに設定
-  document.querySelectorAll('.cal-scroll-box').forEach(el => {
-    initTouchScroll(el);
+  // タッチスクロール登録のみ（幅はCSSで制御）
+  document.querySelectorAll('.cal-scroll-box').forEach(function(box) {
+    initTouchScroll(box);
   });
 }
 
