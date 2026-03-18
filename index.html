@@ -362,11 +362,7 @@
   }
 
 
-  .cal-header-row {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    background: var(--navy);
-  }
+
   .cal-dow {
     text-align: center;
     padding: 10px 4px;
@@ -374,6 +370,7 @@
     font-weight: 700;
     letter-spacing: 0.1em;
     color: rgba(255,255,255,0.85);
+    background: var(--navy);
   }
   .cal-dow.sat { color: #7eb8e8; }
   .cal-dow.sun { color: #e87e7e; }
@@ -931,15 +928,6 @@
 <div class="calendar-wrap" id="single-month-wrap">
   <div class="cal-scroll-box" id="cal-scroll-box">
     <div class="calendar" id="cal-inner">
-      <div class="cal-header-row">
-        <div class="cal-dow">月</div>
-        <div class="cal-dow">火</div>
-        <div class="cal-dow">水</div>
-        <div class="cal-dow">木</div>
-        <div class="cal-dow">金</div>
-        <div class="cal-dow sat">土</div>
-        <div class="cal-dow sun">日</div>
-      </div>
       <div class="cal-body" id="cal-body"></div>
     </div>
   </div>
@@ -1209,7 +1197,7 @@ function renderAllMonths() {
 
     const calDiv = document.createElement('div');
     calDiv.className = 'cal-scroll-box';
-    calDiv.innerHTML = `<div class="calendar"><div class="cal-header-row"><div class="cal-dow">月</div><div class="cal-dow">火</div><div class="cal-dow">水</div><div class="cal-dow">木</div><div class="cal-dow">金</div><div class="cal-dow sat">土</div><div class="cal-dow sun">日</div></div><div class="cal-body" id="cal-body-${year}-${month}"></div></div>`;
+    calDiv.innerHTML = `<div class="calendar"><div class="cal-body" id="cal-body-${year}-${month}"></div></div>`;
     block.appendChild(calDiv);
     allWrap.appendChild(block);
     buildMonthGrid(`cal-body-${year}-${month}`, year, month, byDate);
@@ -1241,6 +1229,15 @@ function renderSingleMonth() {
 function buildMonthGrid(bodyId, year, month, byDate) {
   const body = document.getElementById(bodyId);
   body.innerHTML = '';
+  // 曜日ヘッダーをbodyの最初に追加（同じgrid内）
+  const dows = ['月','火','水','木','金','土','日'];
+  const dowClasses = ['','','','','','sat','sun'];
+  dows.forEach(function(d, i) {
+    const dow = document.createElement('div');
+    dow.className = 'cal-dow' + (dowClasses[i] ? ' ' + dowClasses[i] : '');
+    dow.textContent = d;
+    body.appendChild(dow);
+  });
   const today = new Date();
   const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
   const firstDay = new Date(year, month-1, 1);
@@ -1560,18 +1557,7 @@ function setupScrollWrap() {
     box.style.cssText = 'overflow-x:auto;-webkit-overflow-scrolling:touch;display:block;';
 
     // calendar・header・body を同じ幅・同じgridに設定
-    var cal    = box.querySelector('.calendar');
-    var header = box.querySelector('.cal-header-row');
-    var body   = box.querySelector('.cal-body');
-
-    if (cal) {
-      cal.setAttribute('style', 'width:' + TOTAL + ';min-width:' + TOTAL + ';');
-    }
-    if (header) {
-      header.setAttribute('style',
-        'width:' + TOTAL + ';min-width:' + TOTAL + ';' +
-        'display:grid;grid-template-columns:' + GRID + ';');
-    }
+    var body = box.querySelector('.cal-body');
     if (body) {
       body.setAttribute('style',
         'width:' + TOTAL + ';min-width:' + TOTAL + ';' +
