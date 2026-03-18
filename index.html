@@ -829,10 +829,17 @@
     /* カレンダーグリッド */
     .calendar-wrap, #all-months-wrap { padding: 0 8px 20px; }
 
-    /* スマホ：150px×7列固定でスクロール */
-    .calendar { min-width: 1050px; }
-    .cal-header-row { grid-template-columns: repeat(7, 150px); }
-    .cal-body { grid-template-columns: repeat(7, 150px); }
+    /* スマホ：150px×7列＝1050px固定でスクロール */
+    .calendar,
+    .cal-header-row,
+    .cal-body {
+      width: 1050px;
+      min-width: 1050px;
+    }
+    .cal-header-row,
+    .cal-body {
+      grid-template-columns: repeat(7, 150px);
+    }
 
     /* モーダル */
     .modal { padding: 16px; border-radius: 12px; }
