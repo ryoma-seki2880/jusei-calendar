@@ -829,17 +829,7 @@
     /* カレンダーグリッド */
     .calendar-wrap, #all-months-wrap { padding: 0 8px 20px; }
 
-    /* スマホ：150px×7列＝1050px固定でスクロール */
-    .calendar,
-    .cal-header-row,
-    .cal-body {
-      width: 1050px;
-      min-width: 1050px;
-    }
-    .cal-header-row,
-    .cal-body {
-      grid-template-columns: repeat(7, 150px);
-    }
+
 
     /* モーダル */
     .modal { padding: 16px; border-radius: 12px; }
@@ -1090,7 +1080,7 @@ function renderCalendar() {
   if (viewMode === 'all') renderAllMonths();
   else if (viewMode === 'agenda') renderAgenda();
   else renderSingleMonth();
-  setTimeout(setupScrollWrap, 50);
+  setTimeout(setupScrollWrap, 100);
 }
 
 function setViewMode(mode) {
@@ -1558,16 +1548,46 @@ function initTouchScroll(el) {
 }
 
 function setupScrollWrap() {
-  // タッチスクロール登録のみ（幅はCSSで制御）
+  if (window.innerWidth >= 769) return;
+
+  var COLS = 7;
+  var COL_W = 150;
+  var TOTAL = COLS * COL_W + 'px'; // 1050px
+  var GRID = 'repeat(' + COLS + ', ' + COL_W + 'px)';
+
   document.querySelectorAll('.cal-scroll-box').forEach(function(box) {
+    // スクロールコンテナ：width指定なし（自然にブロック幅）
+    box.style.cssText = 'overflow-x:auto;-webkit-overflow-scrolling:touch;display:block;';
+
+    // calendar・header・body を同じ幅・同じgridに設定
+    var cal    = box.querySelector('.calendar');
+    var header = box.querySelector('.cal-header-row');
+    var body   = box.querySelector('.cal-body');
+
+    if (cal) {
+      cal.setAttribute('style', 'width:' + TOTAL + ';min-width:' + TOTAL + ';');
+    }
+    if (header) {
+      header.setAttribute('style',
+        'width:' + TOTAL + ';min-width:' + TOTAL + ';' +
+        'display:grid;grid-template-columns:' + GRID + ';');
+    }
+    if (body) {
+      body.setAttribute('style',
+        'width:' + TOTAL + ';min-width:' + TOTAL + ';' +
+        'display:grid;grid-template-columns:' + GRID + ';');
+    }
+
     initTouchScroll(box);
   });
 }
 
 // Init
 buildFilters();
-setupScrollWrap();
 renderCalendar();
+// ロード完了後・画面回転時にもスクロール設定を適用
+window.addEventListener('load', function() { setTimeout(setupScrollWrap, 100); });
+window.addEventListener('resize', function() { setTimeout(setupScrollWrap, 100); });
 </script>
 </body>
 </html>
