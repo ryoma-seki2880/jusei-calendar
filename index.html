@@ -830,23 +830,25 @@
       overflow-x: auto;
       -webkit-overflow-scrolling: touch;
     }
-    .cal-scroll-box .calendar {
+    .cal-scroll-box .calendar,
+    .cal-scroll-box .cal-header-row,
+    .cal-scroll-box .cal-body {
       width: 700px;
+      min-width: 700px;
     }
-    .cal-scroll-box .cal-header-row {
-      grid-template-columns: 100px 100px 100px 100px 100px 100px 100px;
-    }
+    .cal-scroll-box .cal-header-row,
     .cal-scroll-box .cal-body {
       grid-template-columns: 100px 100px 100px 100px 100px 100px 100px;
     }
+    .cal-scroll-box .cal-dow,
     .cal-scroll-box .cal-cell {
+      width: 100px;
       min-width: 100px;
       max-width: 100px;
-      min-height: 100px;
+      box-sizing: border-box;
     }
-    .cal-scroll-box .cal-dow {
-      min-width: 100px;
-      max-width: 100px;
+    .cal-scroll-box .cal-cell {
+      min-height: 100px;
     }
     .day-num { font-size: 12px; width: 22px; height: 22px; }
 
