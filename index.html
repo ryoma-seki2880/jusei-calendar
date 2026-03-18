@@ -350,7 +350,6 @@
   .calendar {
     background: var(--bg-card);
     border-radius: 16px;
-    overflow: hidden;
     box-shadow: 0 4px 24px rgba(26,39,68,0.08);
     border: 1px solid var(--border);
   }
@@ -825,23 +824,9 @@
     /* カレンダーグリッド：横スクロール対応 */
     .calendar-wrap, #all-months-wrap { padding: 0 8px 20px; }
 
-    /* Android Chrome横スクロール対応 */
-    #single-month-wrap {
-      overflow-x: auto;
-      overflow-y: hidden;
-      -webkit-overflow-scrolling: touch;
-      touch-action: pan-x;
-      padding-bottom: 8px;
-    }
+    /* スマホ：カレンダーを固定幅に */
     #single-month-wrap .calendar {
-      min-width: 600px;
-      overflow: visible;
-      border-radius: 12px;
-      touch-action: pan-x;
-    }
-    #single-month-wrap .cal-body,
-    #single-month-wrap .cal-header-row {
-      touch-action: pan-x;
+      min-width: 620px;
     }
     .cal-header-row .cal-dow { font-size: 11px; padding: 8px 4px; }
     .cal-cell { min-height: 90px; padding: 4px; min-width: 80px; }
@@ -872,6 +857,16 @@
 
     /* 年間一覧 */
     .month-block-title { font-size: 15px; }
+    /* calendar の overflow を強制解除 */
+    #single-month-wrap,
+    #single-month-wrap .calendar,
+    #single-month-wrap .cal-body {
+      overflow-x: visible !important;
+    }
+    #single-month-wrap {
+      overflow-x: auto !important;
+      -webkit-overflow-scrolling: touch !important;
+    }
   }
 </style>
 </head>
@@ -1552,8 +1547,35 @@ function closeExportDirect() {
   document.getElementById('export-overlay').classList.remove('open');
 }
 
+// ===== タッチスクロール（Android Chrome対応） =====
+function initTouchScroll(el) {
+  let startX = 0, startScrollLeft = 0, isDragging = false;
+  el.addEventListener('touchstart', function(e) {
+    startX = e.touches[0].clientX;
+    startScrollLeft = el.scrollLeft;
+    isDragging = true;
+  }, { passive: true });
+  el.addEventListener('touchmove', function(e) {
+    if (!isDragging) return;
+    const dx = startX - e.touches[0].clientX;
+    el.scrollLeft = startScrollLeft + dx;
+  }, { passive: true });
+  el.addEventListener('touchend', function() { isDragging = false; }, { passive: true });
+}
+
+function setupScrollWrap() {
+  // single-month-wrap を scroll コンテナに
+  const wrap = document.getElementById('single-month-wrap');
+  if (!wrap) return;
+  wrap.style.overflowX = 'auto';
+  wrap.style.overflowY = 'hidden';
+  wrap.style.webkitOverflowScrolling = 'touch';
+  initTouchScroll(wrap);
+}
+
 // Init
 buildFilters();
+setupScrollWrap();
 renderCalendar();
 </script>
 </body>
