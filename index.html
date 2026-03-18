@@ -37,6 +37,7 @@
     background: var(--bg);
     color: var(--text);
     min-height: 100vh;
+    overflow-x: hidden;
   }
 
   /* ===== HEADER ===== */
@@ -825,34 +826,42 @@
     /* カレンダーグリッド */
     .calendar-wrap, #all-months-wrap { padding: 0 8px 20px; }
 
-    /* スクロールコンテナ：画面幅いっぱい、中身は700px固定 */
+    /* スクロールコンテナ */
     .cal-scroll-box {
-      width: 100%;
-      overflow-x: scroll;
-      -webkit-overflow-scrolling: touch;
       display: block;
+      position: relative;
+      width: 100%;
+      max-width: 100vw;
+      overflow-x: scroll;
+      overflow-y: visible;
+      -webkit-overflow-scrolling: touch;
+      box-sizing: border-box;
+      scrollbar-width: thin;
     }
-    /* カレンダー本体を700px固定 */
+    /* カレンダー本体 700px固定・絶対に縮まない */
     .cal-scroll-box .calendar {
+      display: block;
       width: 700px;
       min-width: 700px;
+      max-width: 700px;
+      box-sizing: border-box;
     }
-    /* 曜日ヘッダーとボディを同じ700px・100px×7列に固定 */
-    .cal-scroll-box .cal-header-row {
-      width: 700px;
-      grid-template-columns: 100px 100px 100px 100px 100px 100px 100px;
-    }
+    /* ヘッダーとボディを同じ幅・同じ列数で完全統一 */
+    .cal-scroll-box .cal-header-row,
     .cal-scroll-box .cal-body {
-      width: 700px;
+      display: grid;
       grid-template-columns: 100px 100px 100px 100px 100px 100px 100px;
+      width: 700px;
+      min-width: 700px;
+      box-sizing: border-box;
     }
-    /* セルと曜日を完全に100px固定 */
     .cal-scroll-box .cal-cell {
       width: 100px;
       min-width: 100px;
       max-width: 100px;
       min-height: 100px;
       box-sizing: border-box;
+      overflow: hidden;
     }
     .cal-scroll-box .cal-dow {
       width: 100px;
