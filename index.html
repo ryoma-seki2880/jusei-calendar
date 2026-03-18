@@ -822,45 +822,53 @@
     /* 凡例 */
     .legend { padding: 0 10px 8px; gap: 6px; }
 
-    /* カレンダーグリッド：横スクロール対応 */
+    /* カレンダーグリッド */
     .calendar-wrap, #all-months-wrap { padding: 0 8px 20px; }
 
-    /* スマホ：カレンダー固定幅 - 全要素を700px/7列に統一 */
-    .cal-scroll-box .calendar,
+    /* スクロールコンテナ：画面幅いっぱい、中身は700px固定 */
     .cal-scroll-box {
-      width: 700px !important;
-      min-width: 700px !important;
+      width: 100%;
+      overflow-x: scroll;
+      -webkit-overflow-scrolling: touch;
+      display: block;
     }
-    .cal-scroll-box .cal-header-row,
+    /* カレンダー本体を700px固定 */
+    .cal-scroll-box .calendar {
+      width: 700px;
+      min-width: 700px;
+    }
+    /* 曜日ヘッダーとボディを同じ700px・100px×7列に固定 */
+    .cal-scroll-box .cal-header-row {
+      width: 700px;
+      grid-template-columns: 100px 100px 100px 100px 100px 100px 100px;
+    }
     .cal-scroll-box .cal-body {
-      display: grid !important;
-      grid-template-columns: repeat(7, 100px) !important;
-      width: 700px !important;
+      width: 700px;
+      grid-template-columns: 100px 100px 100px 100px 100px 100px 100px;
     }
+    /* セルと曜日を完全に100px固定 */
     .cal-scroll-box .cal-cell {
-      width: 100px !important;
-      min-width: 100px !important;
-      max-width: 100px !important;
-      min-height: 100px !important;
-      box-sizing: border-box !important;
+      width: 100px;
+      min-width: 100px;
+      max-width: 100px;
+      min-height: 100px;
+      box-sizing: border-box;
     }
     .cal-scroll-box .cal-dow {
-      width: 100px !important;
-      min-width: 100px !important;
-      max-width: 100px !important;
-      box-sizing: border-box !important;
+      width: 100px;
+      min-width: 100px;
+      max-width: 100px;
+      box-sizing: border-box;
     }
-    .cal-header-row .cal-dow { font-size: 11px; padding: 8px 4px; }
-    .cal-cell { min-height: 90px; padding: 4px; min-width: 80px; }
     .day-num { font-size: 12px; width: 22px; height: 22px; }
 
-    /* イベントチップ：横スクロール時は適切なサイズで */
+    /* イベントチップ */
     .event-chip { min-height: 28px; margin-bottom: 3px; border-radius: 5px; }
     .event-chip .ev-jigen-block { min-width: 20px; padding: 2px 4px; }
     .event-chip .ev-jigen-num { font-size: 11px; }
     .event-chip .ev-jigen-time { display: none; }
     .event-chip .ev-body { padding: 2px 5px; }
-    .event-chip .ev-name { font-size: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 55px; }
+    .event-chip .ev-name { font-size: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 60px; }
     .event-chip .ev-koshi { display: none; }
     .more-badge { font-size: 10px; }
 
@@ -879,14 +887,7 @@
 
     /* 年間一覧 */
     .month-block-title { font-size: 15px; }
-    /* スクロールコンテナ強制設定 */
-    .cal-scroll-box {
-      overflow-x: auto !important;
-      overflow-y: visible !important;
-      -webkit-overflow-scrolling: touch !important;
-      width: 100% !important;
-      display: block !important;
-    }
+
   }
 </style>
 </head>
@@ -1247,8 +1248,8 @@ function renderAllMonths() {
     block.appendChild(titleEl);
 
     const calDiv = document.createElement('div');
-    calDiv.className = 'calendar';
-    calDiv.innerHTML = `<div class="cal-scroll-box"><div class="cal-header-row"><div class="cal-dow">月</div><div class="cal-dow">火</div><div class="cal-dow">水</div><div class="cal-dow">木</div><div class="cal-dow">金</div><div class="cal-dow sat">土</div><div class="cal-dow sun">日</div></div><div class="cal-body" id="cal-body-${year}-${month}"></div></div>`;
+    calDiv.className = 'cal-scroll-box';
+    calDiv.innerHTML = `<div class="calendar"><div class="cal-header-row"><div class="cal-dow">月</div><div class="cal-dow">火</div><div class="cal-dow">水</div><div class="cal-dow">木</div><div class="cal-dow">金</div><div class="cal-dow sat">土</div><div class="cal-dow sun">日</div></div><div class="cal-body" id="cal-body-${year}-${month}"></div></div>`;
     block.appendChild(calDiv);
     allWrap.appendChild(block);
     buildMonthGrid(`cal-body-${year}-${month}`, year, month, byDate);
@@ -1587,21 +1588,8 @@ function initTouchScroll(el) {
 }
 
 function setupScrollWrap() {
-  const box = document.getElementById('cal-scroll-box');
-  if (!box) return;
-  box.style.overflowX = 'auto';
-  box.style.overflowY = 'visible';
-  box.style.webkitOverflowScrolling = 'touch';
-  box.style.width = '100%';
-  box.style.display = 'block';
-  initTouchScroll(box);
-  // 年間一覧の全scroll-boxにも適用
+  // タッチスクロールをcal-scroll-boxに設定
   document.querySelectorAll('.cal-scroll-box').forEach(el => {
-    el.style.overflowX = 'auto';
-    el.style.overflowY = 'visible';
-    el.style.webkitOverflowScrolling = 'touch';
-    el.style.width = '100%';
-    el.style.display = 'block';
     initTouchScroll(el);
   });
 }
