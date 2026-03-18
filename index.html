@@ -354,13 +354,7 @@
     box-shadow: 0 4px 24px rgba(26,39,68,0.08);
     border: 1px solid var(--border);
   }
-  /* スマホ横スクロール用ラッパー */
-  .calendar-scroll-outer {
-    overflow: hidden;
-    border-radius: 16px;
-    box-shadow: 0 4px 24px rgba(26,39,68,0.08);
-    border: 1px solid var(--border);
-  }
+
 
   .cal-header-row {
     display: grid;
@@ -830,18 +824,16 @@
 
     /* カレンダーグリッド：横スクロール対応 */
     .calendar-wrap, #all-months-wrap { padding: 0 8px 20px; }
-    .calendar-scroll-outer {
+    .calendar-wrap {
       overflow-x: auto;
+      overflow-y: visible;
       -webkit-overflow-scrolling: touch;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-      box-shadow: 0 4px 24px rgba(26,39,68,0.08);
     }
-    .calendar-scroll-outer .calendar {
-      min-width: 580px;
-      border-radius: 0;
-      box-shadow: none;
-      border: none;
+    #single-month-wrap .calendar,
+    .month-block .calendar {
+      min-width: 600px;
+      overflow: visible;
+      border-radius: 12px;
     }
     .cal-header-row .cal-dow { font-size: 11px; padding: 8px 4px; }
     .cal-cell { min-height: 90px; padding: 4px; min-width: 80px; }
@@ -954,19 +946,17 @@
 </div>
 
 <div class="calendar-wrap" id="single-month-wrap">
-  <div class="calendar-scroll-outer">
-    <div class="calendar">
-      <div class="cal-header-row">
-        <div class="cal-dow">月</div>
-        <div class="cal-dow">火</div>
-        <div class="cal-dow">水</div>
-        <div class="cal-dow">木</div>
-        <div class="cal-dow">金</div>
-        <div class="cal-dow sat">土</div>
-        <div class="cal-dow sun">日</div>
-      </div>
-      <div class="cal-body" id="cal-body"></div>
+  <div class="calendar">
+    <div class="cal-header-row">
+      <div class="cal-dow">月</div>
+      <div class="cal-dow">火</div>
+      <div class="cal-dow">水</div>
+      <div class="cal-dow">木</div>
+      <div class="cal-dow">金</div>
+      <div class="cal-dow sat">土</div>
+      <div class="cal-dow sun">日</div>
     </div>
+    <div class="cal-body" id="cal-body"></div>
   </div>
 </div>
 
@@ -1233,8 +1223,7 @@ function renderAllMonths() {
 
     const calDiv = document.createElement('div');
     calDiv.className = 'calendar';
-    calDiv.innerHTML = `<div class="calendar-scroll-outer"><div class="calendar" style="border-radius:0;box-shadow:none;border:none"><div class="cal-header-row"><div class="cal-dow">月</div><div class="cal-dow">火</div><div class="cal-dow">水</div><div class="cal-dow">木</div><div class="cal-dow">金</div><div class="cal-dow sat">土</div><div class="cal-dow sun">日</div></div><div class="cal-body" id="cal-body-${year}-${month}"></div></div></div>`;
-    calDiv.style.cssText = 'background:none;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(26,39,68,0.08);border:1px solid var(--border)';
+    calDiv.innerHTML = `<div class="cal-header-row"><div class="cal-dow">月</div><div class="cal-dow">火</div><div class="cal-dow">水</div><div class="cal-dow">木</div><div class="cal-dow">金</div><div class="cal-dow sat">土</div><div class="cal-dow sun">日</div></div><div class="cal-body" id="cal-body-${year}-${month}"></div>`;
     block.appendChild(calDiv);
     allWrap.appendChild(block);
     buildMonthGrid(`cal-body-${year}-${month}`, year, month, byDate);
