@@ -352,6 +352,8 @@
   .cal-scroll-box {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+    width: 100%;
+    box-sizing: border-box;
   }
 
   .calendar {
@@ -377,7 +379,7 @@
 
   .cal-body {
     display: grid;
-    grid-template-columns: repeat(7, 1fr);
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 0.4fr;
   }
   .cal-cell {
     border-right: 1px solid var(--border);
@@ -641,7 +643,7 @@
   }
   #all-months-wrap.visible { display: flex; }
 
-  .month-block { }
+  .month-block { width: 100%; }
   .month-block-title {
     font-family: 'Kaisei Tokumin', serif;
     font-size: 18px;
@@ -846,6 +848,9 @@
 
   }
 </style>
+<!-- PDF出力用ライブラリ -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
 
@@ -880,6 +885,14 @@
       <option>午後部</option>
     </select>
   </div>
+  <div class="filter-group">
+    <span class="filter-label">組</span>
+    <select class="filter-select" id="f-kumi">
+      <option value="">全組</option>
+      <option>1組</option>
+      <option>2組</option>
+    </select>
+  </div>
   <div class="filter-sep"></div>
   <div class="filter-group">
     <span class="filter-label">担当教員</span>
@@ -896,6 +909,7 @@
   <div class="filter-sep"></div>
   <button class="btn-reset" onclick="resetFilters()">↺ リセット</button>
   <button class="btn-export" onclick="exportICS()" title="現在のフィルター条件でICSファイルを生成しGoogleカレンダーにインポートできます">📅 Googleカレンダーに登録</button>
+  <button class="btn-export" id="btn-pdf" onclick="exportPDF()" style="background:var(--blue);">🖨 PDF出力</button>
 </div>
 
 <div class="cal-nav">
@@ -1024,9 +1038,11 @@ function updateKamokuOptions() {
   const prev = kamokuSel.value;
 
   // 現在の条件に合うデータを絞り込んで科目リストを生成
+  const kumi = document.getElementById('f-kumi').value;
   const filtered = RAW.filter(r => {
     if (gakunen && r.g !== gakunen) return false;
     if (koshi   && r.k !== koshi)   return false;
+    if (kumi    && (r.ku || '') !== kumi) return false;
     return true;
   });
   const kamokuSet = [...new Set(filtered.map(r=>r.km).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'ja'));
@@ -1046,6 +1062,7 @@ function getFilters() {
   return {
     gakunen: document.getElementById('f-gakunen').value,
     bu: document.getElementById('f-bu').value,
+    kumi: document.getElementById('f-kumi').value,
     koshi: document.getElementById('f-koshi').value,
     kamoku: document.getElementById('f-kamoku').value,
   };
@@ -1058,6 +1075,7 @@ function filterData(year, month) {
     if (!r.s.startsWith(ym)) return false;
     if (f.gakunen && r.g !== f.gakunen) return false;
     if (f.bu && r.b !== f.bu) return false;
+    if (f.kumi && (r.ku || '') !== f.kumi) return false;
     if (f.koshi && r.k !== f.koshi) return false;
     if (f.kamoku && r.km !== f.kamoku) return false;
     return true;
@@ -1364,7 +1382,7 @@ function changeMonth(dir) {
 }
 
 function resetFilters() {
-  ['f-gakunen','f-bu','f-koshi','f-kamoku'].forEach(id => {
+  ['f-gakunen','f-bu','f-kumi','f-koshi','f-kamoku'].forEach(id => {
     document.getElementById(id).value = '';
   });
   updateKamokuOptions();
@@ -1375,6 +1393,7 @@ function resetFilters() {
 document.getElementById('f-gakunen').addEventListener('change', () => { updateKamokuOptions(); renderCalendar(); });
 document.getElementById('f-koshi').addEventListener('change',   () => { updateKamokuOptions(); renderCalendar(); });
 document.getElementById('f-bu').addEventListener('change',      renderCalendar);
+document.getElementById('f-kumi').addEventListener('change',    renderCalendar);
 document.getElementById('f-kamoku').addEventListener('change',  renderCalendar);
 
 // Keyboard close modal
@@ -1395,6 +1414,7 @@ function exportICS() {
     }
     if (f.gakunen && r.g !== f.gakunen) return false;
     if (f.bu     && r.b !== f.bu)       return false;
+    if (f.kumi   && (r.ku || '') !== f.kumi) return false;
     if (f.koshi  && r.k !== f.koshi)    return false;
     if (f.kamoku && r.km !== f.kamoku)  return false;
     return true;
@@ -1547,10 +1567,8 @@ function initTouchScroll(el) {
 function setupScrollWrap() {
   if (window.innerWidth >= 769) return;
 
-  var COLS = 7;
-  var COL_W = 150;
-  var TOTAL = COLS * COL_W + 'px'; // 1050px
-  var GRID = 'repeat(' + COLS + ', ' + COL_W + 'px)';
+  var TOTAL = '960px'; // 150×6 + 60 = 960px
+  var GRID = '150px 150px 150px 150px 150px 150px 60px';
 
   document.querySelectorAll('.cal-scroll-box').forEach(function(box) {
     // スクロールコンテナ：width指定なし（自然にブロック幅）
@@ -1563,9 +1581,114 @@ function setupScrollWrap() {
         'width:' + TOTAL + ';min-width:' + TOTAL + ';' +
         'display:grid;grid-template-columns:' + GRID + ';');
     }
+    var cal = box.querySelector('.calendar');
+    if (cal) cal.setAttribute('style', 'width:' + TOTAL + ';min-width:' + TOTAL + ';');
 
     initTouchScroll(box);
   });
+}
+
+// ===== PDF出力 =====
+async function exportPDF() {
+  const btn = document.getElementById('btn-pdf');
+  btn.textContent = '⏳ 生成中...';
+  btn.disabled = true;
+
+  try {
+    // 出力対象要素を取得
+    const calWrap = document.getElementById('single-month-wrap');
+    const agendaWrap = document.getElementById('agenda-wrap');
+    const allWrap = document.getElementById('all-months-wrap');
+
+    // 現在表示中の要素を特定
+    let target;
+    if (viewMode === 'single') target = calWrap;
+    else if (viewMode === 'agenda') target = agendaWrap;
+    else target = allWrap;
+
+    // スクロール幅を一時的に解除してフルサイズ描画
+    const origOverflow = target.style.overflowX;
+    const origWidth = target.style.width;
+    target.style.overflowX = 'visible';
+    target.style.width = 'auto';
+
+    // cal-bodyとheader-rowのwidthも一時解除
+    const calBody = target.querySelector('.cal-body');
+    const origBodyStyle = calBody ? calBody.getAttribute('style') : null;
+
+    await new Promise(r => setTimeout(r, 100));
+
+    const canvas = await html2canvas(target, {
+      scale: 1.5,
+      useCORS: true,
+      allowTaint: true,
+      scrollX: 0,
+      scrollY: 0,
+      width: target.scrollWidth,
+      height: target.scrollHeight,
+      windowWidth: target.scrollWidth + 100,
+    });
+
+    // 元のスタイルに戻す
+    target.style.overflowX = origOverflow;
+    target.style.width = origWidth;
+    if (calBody && origBodyStyle !== null) calBody.setAttribute('style', origBodyStyle);
+
+    const { jsPDF: jsPDF2 } = window.jspdf;
+    const monthNames = ['','1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+
+    if (viewMode === 'all') {
+      // 年間一覧：月ブロックごとに1ページ
+      const pdf = new jsPDF2({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+      const pageW = pdf.internal.pageSize.getWidth();
+      const pageH = pdf.internal.pageSize.getHeight();
+      const blocks = document.querySelectorAll('.month-block');
+      let first = true;
+      for (let i = 0; i < blocks.length; i++) {
+        const block = blocks[i];
+        // 一時的にオーバーフロー解除
+        const scrollBox = block.querySelector('.cal-scroll-box');
+        const origOF = scrollBox ? scrollBox.style.overflowX : null;
+        if (scrollBox) scrollBox.style.overflowX = 'visible';
+        await new Promise(r => setTimeout(r, 30));
+        const bc = await html2canvas(block, {
+          scale: 1.5, useCORS: true, allowTaint: true,
+          scrollX: 0, scrollY: 0,
+          width: block.scrollWidth, height: block.scrollHeight,
+          windowWidth: block.scrollWidth + 100,
+        });
+        if (scrollBox && origOF !== null) scrollBox.style.overflowX = origOF;
+        if (!first) pdf.addPage();
+        first = false;
+        const ratio = Math.min(pageW / bc.width, pageH / bc.height);
+        const fw = bc.width * ratio;
+        const fh = bc.height * ratio;
+        pdf.addImage(bc.toDataURL('image/jpeg', 0.92), 'JPEG',
+          (pageW - fw) / 2, (pageH - fh) / 2, fw, fh);
+      }
+      pdf.save('柔整科授業カレンダー_年間.pdf');
+    } else {
+      // 月表示・リスト表示：1ページ
+      const pdf = new jsPDF2({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+      const pageW = pdf.internal.pageSize.getWidth();
+      const pageH = pdf.internal.pageSize.getHeight();
+      const imgW = canvas.width;
+      const imgH = canvas.height;
+      const ratio = Math.min(pageW / imgW, pageH / imgH);
+      const finalW = imgW * ratio;
+      const finalH = imgH * ratio;
+      const imgData = canvas.toDataURL('image/jpeg', 0.92);
+      pdf.addImage(imgData, 'JPEG', (pageW-finalW)/2, (pageH-finalH)/2, finalW, finalH);
+      const fname = `柔整科授業カレンダー_${currentYear}年${monthNames[currentMonth]}.pdf`;
+      pdf.save(fname);
+    }
+
+  } catch(e) {
+    alert('PDF生成に失敗しました: ' + e.message);
+  } finally {
+    btn.textContent = '🖨 PDF出力';
+    btn.disabled = false;
+  }
 }
 
 // Init
