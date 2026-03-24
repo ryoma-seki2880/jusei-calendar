@@ -408,6 +408,7 @@
   }
   .cal-cell.sat .day-num { color: #2980b9; }
   .cal-cell.sun .day-num { color: #c0392b; }
+  .cal-cell.holiday .day-num { color: #c0392b; }
   .cal-cell.has-events:hover { background: #f5f8ff; }
 
   .day-num {
@@ -719,6 +720,8 @@
   .agenda-day-label.sat .agenda-day-dow { color: #2980b9; }
   .agenda-day-label.sun .agenda-day-num,
   .agenda-day-label.sun .agenda-day-dow { color: #c0392b; }
+  .agenda-day-label.holiday-day .agenda-day-num,
+  .agenda-day-label.holiday-day .agenda-day-dow { color: #c0392b; }
   .agenda-day-label.today-label .agenda-day-num {
     background: var(--accent);
     color: #fff;
@@ -773,6 +776,274 @@
   .agenda-chip.zennitsu .ag-jigen { color: #c0392b; }
 
   /* ===== TABLET ===== */
+  /* ===== URL生成モーダル ===== */
+  .url-gen-modal {
+    background: var(--bg-card);
+    border-radius: 16px;
+    padding: 28px;
+    max-width: 500px;
+    width: 100%;
+    box-shadow: 0 20px 60px rgba(26,39,68,0.3);
+    position: relative;
+  }
+  .url-gen-modal h3 {
+    font-family: 'Kaisei Tokumin', serif;
+    font-size: 17px;
+    color: var(--navy);
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--border);
+  }
+  .url-gen-fields {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .url-gen-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+    min-width: 120px;
+  }
+  .url-gen-field label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-muted);
+    letter-spacing: 0.08em;
+  }
+  .url-gen-field select {
+    appearance: none;
+    background: var(--bg);
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 7px 28px 7px 10px;
+    font-size: 13px;
+    font-family: inherit;
+    color: var(--text);
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7a99' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+  }
+  .btn-gen-url {
+    width: 100%;
+    padding: 11px;
+    background: linear-gradient(135deg, var(--navy), var(--blue));
+    border: none;
+    border-radius: 10px;
+    color: #fff;
+    font-size: 14px;
+    font-family: inherit;
+    font-weight: 700;
+    cursor: pointer;
+    margin-bottom: 16px;
+    transition: opacity 0.2s;
+  }
+  .btn-gen-url:hover { opacity: 0.88; }
+  .url-result {
+    display: none;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .url-result.visible { display: flex; }
+  .url-box {
+    background: var(--bg);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 11px;
+    word-break: break-all;
+    color: var(--blue);
+    font-family: monospace;
+    line-height: 1.5;
+  }
+  .url-actions {
+    display: flex;
+    gap: 8px;
+  }
+  .btn-url-action {
+    flex: 1;
+    padding: 9px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg-card);
+    font-size: 12px;
+    font-family: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--text);
+    transition: all 0.2s;
+  }
+  .btn-url-action:hover { border-color: var(--blue); color: var(--blue); }
+  .qr-wrap {
+    display: flex;
+    justify-content: center;
+    padding: 8px 0;
+  }
+  #qr-canvas {
+    border-radius: 8px;
+    border: 4px solid #fff;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+  }
+
+  /* ===== MODE TOGGLE ===== */
+  .mode-toggle-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+  .mode-label {
+    font-size: 11px;
+    color: rgba(255,255,255,0.7);
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+  }
+  .mode-switch {
+    position: relative;
+    width: 44px;
+    height: 24px;
+    flex-shrink: 0;
+  }
+  .mode-switch input { opacity: 0; width: 0; height: 0; }
+  .mode-slider {
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,0.25);
+    border-radius: 24px;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+  .mode-slider:before {
+    content: '';
+    position: absolute;
+    width: 18px; height: 18px;
+    left: 3px; top: 3px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform 0.3s;
+  }
+  .mode-switch input:checked + .mode-slider { background: var(--accent); }
+  .mode-switch input:checked + .mode-slider:before { transform: translateX(20px); }
+
+  /* ===== STUDENT MODE OVERLAY ===== */
+  #student-select-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(135deg, var(--navy) 0%, var(--blue) 100%);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  #student-select-overlay.open { display: flex; }
+  .student-select-box {
+    background: var(--bg-card);
+    border-radius: 20px;
+    padding: 36px 32px;
+    max-width: 400px;
+    width: 100%;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.4);
+    text-align: center;
+  }
+  .student-select-box .ss-icon {
+    font-size: 48px;
+    margin-bottom: 12px;
+  }
+  .student-select-box h2 {
+    font-family: 'Kaisei Tokumin', serif;
+    font-size: 20px;
+    color: var(--navy);
+    margin-bottom: 6px;
+  }
+  .student-select-box p {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+  }
+  .ss-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 24px;
+    text-align: left;
+  }
+  .ss-field label {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-muted);
+    letter-spacing: 0.08em;
+    margin-bottom: 4px;
+  }
+  .ss-field select {
+    width: 100%;
+    appearance: none;
+    background: var(--bg);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 32px 10px 14px;
+    font-size: 14px;
+    font-family: inherit;
+    color: var(--text);
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7a99' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+  }
+  .ss-field select:focus { outline: none; border-color: var(--blue); }
+  .btn-enter-student {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, var(--navy), var(--blue));
+    border: none;
+    border-radius: 12px;
+    color: #fff;
+    font-size: 15px;
+    font-family: inherit;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    box-shadow: 0 6px 20px rgba(26,39,68,0.3);
+    transition: opacity 0.2s;
+  }
+  .btn-enter-student:hover { opacity: 0.88; }
+
+  /* 学生モード時のフィルターバー */
+  body.student-mode .filter-group-class { display: none; }
+  body.student-mode #btn-urlgen { display: none; }
+  body.student-mode .filter-group-koshi { display: none; }
+  body.student-mode #btn-urlgen { display: none; }
+  body.student-mode .filter-sep-class { display: none; }
+  body.student-mode .btn-reset { display: none; }
+  body.student-mode #student-class-badge { display: flex; }
+  #student-class-badge {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    background: var(--navy);
+    color: #fff;
+    border-radius: 8px;
+    padding: 5px 12px;
+    font-size: 13px;
+    font-weight: 700;
+  }
+  #student-class-badge button {
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.7);
+    cursor: pointer;
+    font-size: 13px;
+    padding: 0 0 0 6px;
+    line-height: 1;
+  }
+  #student-class-badge button:hover { color: #fff; }
+
   @media (max-width: 768px) {
     .header { padding: 14px 16px; gap: 12px; }
     .header-title h1 { font-size: 16px; }
@@ -854,6 +1125,7 @@
 </head>
 <body>
 
+
 <div class="header">
   <div class="header-icon">📅</div>
   <div class="header-title">
@@ -864,10 +1136,13 @@
     <strong id="filtered-count">—</strong>
     件表示中
   </div>
+  <div id="student-mode-badge" style="display:none;background:var(--accent);color:var(--navy);border-radius:8px;padding:5px 12px;font-size:12px;font-weight:700;letter-spacing:0.04em;">
+    🎓 学生モード
+  </div>
 </div>
 
 <div class="filter-bar">
-  <div class="filter-group">
+  <div class="filter-group filter-group-class">
     <span class="filter-label">学年</span>
     <select class="filter-select" id="f-gakunen">
       <option value="">全学年</option>
@@ -876,7 +1151,7 @@
       <option>3学年</option>
     </select>
   </div>
-  <div class="filter-group">
+  <div class="filter-group filter-group-class">
     <span class="filter-label">部</span>
     <select class="filter-select" id="f-bu">
       <option value="">全部</option>
@@ -885,7 +1160,7 @@
       <option>午後部</option>
     </select>
   </div>
-  <div class="filter-group">
+  <div class="filter-group filter-group-class">
     <span class="filter-label">組</span>
     <select class="filter-select" id="f-kumi">
       <option value="">全組</option>
@@ -893,8 +1168,8 @@
       <option>2組</option>
     </select>
   </div>
-  <div class="filter-sep"></div>
-  <div class="filter-group">
+  <div class="filter-sep filter-sep-class"></div>
+  <div class="filter-group filter-group-koshi">
     <span class="filter-label">担当教員</span>
     <select class="filter-select" id="f-koshi">
       <option value="">全教員</option>
@@ -908,8 +1183,13 @@
   </div>
   <div class="filter-sep"></div>
   <button class="btn-reset" onclick="resetFilters()">↺ リセット</button>
+  <div id="student-class-badge">
+    <span id="student-class-label"></span>
+    <button onclick="openStudentSelect()" title="クラスを変更">✎</button>
+  </div>
   <button class="btn-export" onclick="exportICS()" title="現在のフィルター条件でICSファイルを生成しGoogleカレンダーにインポートできます">📅 Googleカレンダーに登録</button>
   <button class="btn-export" id="btn-pdf" onclick="exportPDF()" style="background:var(--blue);">🖨 PDF出力</button>
+  <button class="btn-export" id="btn-urlgen" onclick="openUrlGen()" style="background:#5b2d8a;" title="学生用URLを生成">🔗 学生用URL生成</button>
 </div>
 
 <div class="cal-nav">
@@ -963,6 +1243,53 @@
     </div>
     <button class="btn-download" onclick="doDownloadICS(null)">⬇ ICSファイルをダウンロード</button>
     <p class="export-note">※ 現在のフィルター条件で絞り込んだ授業のみ出力されます</p>
+  </div>
+</div>
+
+<!-- URL生成モーダル -->
+<div class="modal-overlay" id="urlgen-overlay" onclick="closeUrlGen(event)">
+  <div class="url-gen-modal">
+    <button class="modal-close" onclick="document.getElementById('urlgen-overlay').classList.remove('open')">✕</button>
+    <h3>🔗 学生用URL・QRコード生成</h3>
+    <div class="url-gen-fields">
+      <div class="url-gen-field">
+        <label>学年</label>
+        <select id="ug-gakunen">
+          <option value="">選択</option>
+          <option>1学年</option>
+          <option>2学年</option>
+          <option>3学年</option>
+        </select>
+      </div>
+      <div class="url-gen-field">
+        <label>部</label>
+        <select id="ug-bu">
+          <option value="">選択</option>
+          <option>全日部</option>
+          <option>午前部</option>
+          <option>午後部</option>
+        </select>
+      </div>
+      <div class="url-gen-field">
+        <label>組（任意）</label>
+        <select id="ug-kumi">
+          <option value="">なし</option>
+          <option>1組</option>
+          <option>2組</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn-gen-url" onclick="generateStudentUrl()">🔗 URLを生成</button>
+    <div class="url-result" id="url-result">
+      <div class="url-box" id="url-display"></div>
+      <div class="url-actions">
+        <button class="btn-url-action" onclick="copyStudentUrl()">📋 URLをコピー</button>
+        <button class="btn-url-action" onclick="downloadQR()">⬇ QRコード保存</button>
+      </div>
+      <div class="qr-wrap">
+        <canvas id="qr-canvas"></canvas>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -1173,7 +1500,8 @@ function renderAgenda() {
     const dow = new Date(year, month-1, d).getDay();
     const dowLabel = dowNames[dow];
     const isToday = dateStr === todayStr;
-    const dowClass = dow===6?'sat':dow===0?'sun':'';
+    const isHolA = isHoliday(dateStr);
+    const dowClass = dow===6?'sat':dow===0?'sun':(isHolA?'holiday-day':'');
 
     const dayEl = document.createElement('div');
     dayEl.className = 'agenda-day';
@@ -1286,10 +1614,12 @@ function buildMonthGrid(bodyId, year, month, byDate) {
     const isToday = dateStr === todayStr;
 
     const cell = document.createElement('div');
+    const isHol = !isOther && isHoliday(dateStr);
     cell.className = 'cal-cell' +
       (isOther ? ' other-month' : '') +
       (isToday ? ' today' : '') +
-      (dow===6 ? ' sat' : dow===0 ? ' sun' : '');
+      (dow===6 ? ' sat' : dow===0 ? ' sun' : '') +
+      (isHol ? ' holiday' : '');
 
     const events = byDate[dateStr] || [];
     if (events.length > 0 && !isOther) cell.classList.add('has-events');
@@ -1728,12 +2058,157 @@ async function exportPDF() {
   }
 }
 
+// ===== 日本の祝日 =====
+const HOLIDAYS = new Set([
+  // 2026年
+  '2026-01-01','2026-01-12','2026-02-11','2026-02-23','2026-03-20',
+  '2026-04-29','2026-05-03','2026-05-04','2026-05-05','2026-05-06',
+  '2026-07-20','2026-08-11','2026-09-21','2026-09-22','2026-09-23',
+  '2026-10-12','2026-11-03','2026-11-23',
+  // 2027年
+  '2027-01-01','2027-01-11','2027-02-11','2027-02-23','2027-03-21',
+  '2027-04-29','2027-05-03','2027-05-04','2027-05-05',
+  '2027-07-19','2027-08-11','2027-09-20','2027-09-23',
+  '2027-10-11','2027-11-03','2027-11-23',
+]);
+function isHoliday(dateStr) { return HOLIDAYS.has(dateStr); }
+
+// ===== 学生用URL生成 =====
+let _generatedUrl = '';
+
+function openUrlGen() {
+  document.getElementById('urlgen-overlay').classList.add('open');
+  document.getElementById('url-result').classList.remove('visible');
+}
+
+function closeUrlGen(e) {
+  if (e.target === document.getElementById('urlgen-overlay')) {
+    document.getElementById('urlgen-overlay').classList.remove('open');
+  }
+}
+
+function generateStudentUrl() {
+  const g = document.getElementById('ug-gakunen').value;
+  const b = document.getElementById('ug-bu').value;
+  const k = document.getElementById('ug-kumi').value;
+
+  if (!g || !b) { alert('学年と部を選択してください'); return; }
+
+  const base = window.location.origin + window.location.pathname;
+  const params = new URLSearchParams({ mode: 'student', g, b });
+  if (k) params.set('k', k);
+  _generatedUrl = base + '?' + params.toString();
+
+  document.getElementById('url-display').textContent = _generatedUrl;
+  document.getElementById('url-result').classList.add('visible');
+
+  // QRコード生成
+  const canvas = document.getElementById('qr-canvas');
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  if (window.QRCode) {
+    // QRCode.jsを使って一時divに生成してからcanvasに転写
+    const tmpDiv = document.createElement('div');
+    document.body.appendChild(tmpDiv);
+    new QRCode(tmpDiv, {
+      text: _generatedUrl,
+      width: 200,
+      height: 200,
+      colorDark: '#1a2744',
+      colorLight: '#ffffff',
+    });
+    setTimeout(() => {
+      const qrImg = tmpDiv.querySelector('img') || tmpDiv.querySelector('canvas');
+      if (qrImg) {
+        canvas.width = 200;
+        canvas.height = 200;
+        if (qrImg.tagName === 'CANVAS') {
+          ctx.drawImage(qrImg, 0, 0);
+        } else {
+          const img = new Image();
+          img.onload = () => ctx.drawImage(img, 0, 0, 200, 200);
+          img.src = qrImg.src;
+        }
+      }
+      document.body.removeChild(tmpDiv);
+    }, 100);
+  } else {
+    // QRCodeライブラリ未ロード時はURLのみ表示
+    canvas.width = 0; canvas.height = 0;
+  }
+}
+
+function copyStudentUrl() {
+  if (!_generatedUrl) return;
+  navigator.clipboard.writeText(_generatedUrl).then(() => {
+    alert('URLをコピーしました！');
+  }).catch(() => {
+    prompt('URLをコピーしてください:', _generatedUrl);
+  });
+}
+
+function downloadQR() {
+  const canvas = document.getElementById('qr-canvas');
+  if (!canvas.width) { alert('QRコードが生成されていません'); return; }
+  const g = document.getElementById('ug-gakunen').value;
+  const b = document.getElementById('ug-bu').value;
+  const k = document.getElementById('ug-kumi').value;
+  const a = document.createElement('a');
+  a.download = `QR_${g}_${b}${k ? '_'+k : ''}.png`;
+  a.href = canvas.toDataURL('image/png');
+  a.click();
+}
+
+// ===== 学生モード（URLパラメータ判定）=====
+let appMode = 'teacher';
+
+function isStudentURL() {
+  const p = new URLSearchParams(window.location.search);
+  return p.get('mode') === 'student';
+}
+
+function getStudentParams() {
+  const p = new URLSearchParams(window.location.search);
+  return {
+    g: decodeURIComponent(p.get('g') || ''),
+    b: decodeURIComponent(p.get('b') || ''),
+    k: decodeURIComponent(p.get('k') || ''),
+  };
+}
+
+function activateStudentMode() {
+  const {g, b, k} = getStudentParams();
+  if (!g || !b) return;
+
+  appMode = 'student';
+  document.body.classList.add('student-mode');
+  document.getElementById('student-mode-badge').style.display = '';
+
+  document.getElementById('f-gakunen').value = g;
+  document.getElementById('f-bu').value = b;
+  document.getElementById('f-kumi').value = k;
+
+  const label = g + ' ' + b + (k ? ' ' + k : '');
+  document.getElementById('student-class-label').textContent = label;
+
+  _occurrenceMap = null;
+  updateKamokuOptions();
+  renderCalendar();
+}
+
 // Init
 buildFilters();
-renderCalendar();
+// URLパラメータで ?mode=student の場合は学生モードで起動
+if (isStudentURL()) {
+  activateStudentMode();
+} else {
+  renderCalendar();
+}
 // ロード完了後・画面回転時にもスクロール設定を適用
 window.addEventListener('load', function() { setTimeout(setupScrollWrap, 100); });
 window.addEventListener('resize', function() { setTimeout(setupScrollWrap, 100); });
 </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </body>
 </html>
